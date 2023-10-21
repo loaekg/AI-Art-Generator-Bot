@@ -1,0 +1,111 @@
+import webbrowser
+import tweepy
+from base64 import b64decode
+import openai
+import time
+import json
+import re
+
+#Twitter
+api_key= "-"
+api_secret= "-"
+bearer_token= r"-"
+access_token= "-"
+access_token_secret= "--"
+
+
+
+
+client = tweepy.Client(bearer_token, api_key, api_secret, access_token, access_token_secret)
+auth = tweepy.OAuth1UserHandler(api_key, api_secret, access_token, access_token_secret)
+api = tweepy.API(auth)
+client_id = client.get_me().data.id
+
+
+
+openai.api_key='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'
+
+def generatedImage(prompt, image_count):
+    images = []
+    response = openai.Image.create(
+        prompt=prompt,
+        n=image_count,
+        size= '1024x1024',
+        response_format='b64_json'
+        )
+    for image in response['data']:
+        images.append(image.b64_json)
+
+    prefix = 'Img'
+    for index,image in enumerate(images):
+        with open(f'{prefix}_{index}.jpg','wb') as file:
+            file.write(b64decode(image))
+            
+
+
+# Bot's unique ID
+client_id = client.get_me().data.id
+
+
+
+
+def removeM(tweet):
+    a1=tweet.text
+    a2= a1.lower().replace("@botimg_ai", '')
+    return a2
+
+
+
+
+    
+
+# This is so the bot only looks for the most recent tweets.
+start_id = 1
+
+
+
+
+
+
+
+while True:
+    response = client.get_users_mentions(client_id, since_id=start_id)
+    
+    if response.data != None:
+        
+        for tweet in response.data: 
+                       
+            try:
+                if "ارسم" in tweet.text:
+
+                    mention_tweet = api.get_status(tweet.id, tweet_mode="extended")
+                    # Get the user's timeline
+                    user_timeline = api.user_timeline(screen_name=mention_tweet.author.screen_name, count=20, tweet_mode="extended")
+        
+                previous_tweet = None
+                for t in user_timeline:
+                    if t.id == mention_tweet.id:
+                        break
+                    previous_tweet = t
+                time.sleep(5)
+        
+                # Print the previous tweet's text to the console
+                if previous_tweet is not None:
+                    print(previous_tweet.full_text)
+
+                else:
+                    start_id= tweet.id
+                    pic=generatedImage(removeM(tweet), image_count=1)
+                    media = api.media_upload(filename='Img_0.jpg')
+                    print(removeM(tweet))
+
+                    api.update_status(status='الصوره جاهزة!', in_reply_to_status_id=tweet.id, media_ids=[media.media_id], auto_populate_reply_metadata=True)
+            except Exception as error:
+                print(error)
+            
+
+    time.sleep(5)
+
+
+
+
