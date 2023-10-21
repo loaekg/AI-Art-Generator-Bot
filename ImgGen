@@ -23,7 +23,7 @@ client_id = client.get_me().data.id
 
 
 
-openai.api_key='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'
+openai.api_key='--'
 
 def generatedImage(prompt, image_count):
     images = []
