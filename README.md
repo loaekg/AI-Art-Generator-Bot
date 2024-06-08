@@ -17,10 +17,6 @@ GitHub:
 Instagram:
 - [@y8f3](https://www.instagram.com/y8f3)
 
-Twitter:
-- [@ALsisi_gaming](https://www.twitter.com/alsisi_gaming)
-
-
 
 
 ## License
